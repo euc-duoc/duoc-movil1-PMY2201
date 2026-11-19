@@ -20,8 +20,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PantallaLogin(
-    validar: (String, String) -> Boolean,
-    alIngresar: (String) -> Unit,
+    alIntentarIngreso: (String, String) -> Boolean,
     modifier: Modifier = Modifier
 ) {
     var usuario by remember { mutableStateOf("") }
@@ -63,15 +62,15 @@ fun PantallaLogin(
         Button(onClick = {
             val nombreUsuario = usuario.trim()
 
-            when {
+            mensajeError = when {
                 nombreUsuario.isBlank() || contrasena.isBlank() ->
-                    mensajeError = "Completa ambos campos."
+                    "Completa ambos campos."
 
-                validar(nombreUsuario, contrasena) ->
-                    alIngresar(nombreUsuario)
+                alIntentarIngreso(nombreUsuario, contrasena) ->
+                    null
 
                 else ->
-                    mensajeError = "Usuario o contraseña incorrectos."
+                    "Usuario o contraseña incorrectos."
             }
         }) {
             Text("Ingresar")

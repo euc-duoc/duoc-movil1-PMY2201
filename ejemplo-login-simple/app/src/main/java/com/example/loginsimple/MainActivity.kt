@@ -10,10 +10,9 @@ import androidx.compose.material3.Scaffold
 import com.example.loginsimple.ui.theme.LoginSimpleTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,27 +29,23 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppLogin(modifier: Modifier = Modifier) {
-    val validador = remember { ValidadorLogin() }
-    var usuarioActivo by remember { mutableStateOf<String?>(null) }
-    var totalIngresos by remember { mutableStateOf(0) }
-
-    val usuario = usuarioActivo
+fun AppLogin(
+    modifier: Modifier = Modifier,
+    loginViewModel: LoginViewModel = viewModel()
+) {
+    val estado by loginViewModel.estado.observeAsState(EstadoLogin())
+    val usuario = estado.usuarioActivo
 
     if (usuario == null) {
         PantallaLogin(
-            validar = validador::validar,
-            alIngresar = { nombre ->
-                totalIngresos++
-                usuarioActivo = nombre
-            },
+            alIntentarIngreso = loginViewModel::ingresar,
             modifier = modifier
         )
     } else {
         PantallaBienvenida(
             usuario = usuario,
-            totalIngresos = totalIngresos,
-            alVolver = { usuarioActivo = null },
+            totalIngresos = estado.totalIngresos,
+            alVolver = loginViewModel::volverAlLogin,
             modifier = modifier
         )
     }
